@@ -24,3 +24,75 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+.loading-vacio{
+    visibility: hidden;
+}
+.mat-card-header-text {
+    margin: 0 !important;
+    width: 100% !important;
+}
+.fecha-card{
+    font: normal normal normal 16px Roboto;
+    letter-spacing: 0.14px;
+    color: #000000DE;
+    opacity: 1;
+    padding-left: 16px;
+    margin-bottom: 8px;
+}
+.imgs-home{
+    min-width: 100%;
+    min-height: 192px;
+    padding: 0;
+    margin: 0;
+}
+.card-home{
+    padding: 0;
+}
+.text-seleccione{
+    color: #000000DE;
+    font-size: 14px;
+    font-family: 'Roboto';
+    letter-spacing: 0.1px;
+    padding-bottom: 32px;
+    padding-top:24px;
+    padding-left: 16px;
+}
+.field-tipo-atencion{
+    width: 100%;
+    padding-top: 32px;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.back-app{
+    --background: #F5F5F5;
+}
+/* compartiendo css */
+.text-avatar{
+    font-family: 'Roboto';
+    letter-spacing: 0.15px;
+    color: #000000DE;
+    font-size: 1em;
+    margin-bottom: 0;
+  }
+  .subtext-avatar{
+    font-family: 'Roboto';
+    letter-spacing: 0.25px;
+    color: #00000099;
+    font-size: 0.875em;
+    margin-bottom: 0;
+  }
+  .texto-item{
+    color: #00000099;
+    font-size: 14px;
+}
+.mat-form-field-appearance-outline .mat-form-field-outline {
+    display: flex;
+    position: absolute;
+    top: 0.25em;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: white;
+}

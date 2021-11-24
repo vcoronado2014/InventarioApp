@@ -5,10 +5,51 @@
 </ion-header> -->
 
 <ion-content class="ion-padding">
+
+<form [hidden]="estaCargando" [formGroup]="forma" novalidate>
 <h1>Login</h1>
-<mat-form-field appearance="outline" style="width: 100%;">
-  <mat-label>RUN</mat-label>
-  <input matInput placeholder="125458524" name="run">
-  <mat-error>Run requerido</mat-error>
-</mat-form-field>
+<ion-row class="ion-no-margin ion-no-padding">
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Ubicación</mat-label>
+    <input matInput placeholder="ubicación" name="ubicacion" formControlName="ubicacion">
+    <mat-error>Ubicación requerida</mat-error>
+  </mat-form-field>
+  
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Usuario</mat-label>
+    <input matInput placeholder="125458524" name="usuario" formControlName="usuario">
+    <mat-error>Usuario requerido</mat-error>
+  </mat-form-field>
+  
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Contraseña</mat-label>
+    <input matInput placeholder="Clave" type="password" name="clave" formControlName="clave" required>
+    <mat-error [hidden]="!(f.clave.errors && f.clave.errors.required)">Clave requerida</mat-error>
+  </mat-form-field>
+</ion-row>
+<ion-grid>
+  <ion-row>
+    <ion-col>
+      <ion-item lines="none" style="--ion-item-background: transparent;">
+        <ion-label style="word-wrap: break-word;font-size: 0.9em;white-space: break-spaces;">Recordarme</ion-label>
+        <ion-toggle name="recuerda" formControlName="recordarmeForm" (ionChange)="onChange($event)" mode="ios"></ion-toggle>
+      </ion-item> 
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<!-- <ion-row class="ion-no-margin ion-no-padding">
+  <ion-item>
+    <ion-label>Recordarme</ion-label>
+    <ion-toggle [(ngModel)]="recordarme" (ionChange)="onChange($event)"></ion-toggle>
+  </ion-item>
+</ion-row> -->
+
+
+<ion-row class="ion-no-padding ion-no-margin">
+  <button mat-raised-button color="primary" style="width: 90%; margin-left: 5%; height:36px;" (click)="onSubmit()">Ingresar</button>
+</ion-row>
+
+</form>
+
 </ion-content>

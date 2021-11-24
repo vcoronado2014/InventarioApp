@@ -5,7 +5,8 @@ import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-
+//servicios
+import { ServicioGlobal } from './services/ServicioGlobal';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -24,8 +25,13 @@ import { MatDatepickerModule  } from '@angular/material/datepicker';
 import { MatSelectModule  } from '@angular/material/select'
 import { MatIconModule  } from '@angular/material/icon';
 
+import { ComponentsModule } from './components/components.module';
+
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [
+    //ProgressbarComponent,
+    AppComponent
+  ],
   entryComponents: [],
   imports: [
     HttpClientModule,
@@ -39,6 +45,7 @@ import { MatIconModule  } from '@angular/material/icon';
     MatDatepickerModule,
     FormsModule,
     ReactiveFormsModule,
+    ComponentsModule,
     IonicModule.forRoot(), 
     AppRoutingModule, BrowserAnimationsModule
   ],
@@ -46,6 +53,7 @@ import { MatIconModule  } from '@angular/material/icon';
     StatusBar,
     SplashScreen,
     HTTP,
+    ServicioGlobal,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent],

@@ -1,20 +1,32 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="back-app">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div *ngIf="mostrarProgress == false">
+    <ion-row class="bienvenido">
+      <h1>¡Bienvenido!</h1>
+      <p class="pt-32">Para continuar selecciona la bodega en la cual realizarás el inventario.</p>
+    </ion-row>
+  
+    <ion-row class="ion-no-margin ion-no-padding">
+      <mat-form-field appearance="outline" class="field-tipo-atencion">
+        <mat-label>Selecciona bodega</mat-label>
+        <mat-select [disabled]="disabledCombo" [(ngModel)]="comboSeleccionado" (selectionChange)="buscarBodegas($event)">
+          <mat-option *ngFor="let bode of bodegas" [value]="bode.Id">{{bode.Nombre}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ion-row>
+  
+    <ion-row class="botones">
+      <ion-col>
+        <ion-button expand="full" fill="clear" color="medium" (click)="cerrarSesion()">Cerrar sesión</ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button expand="full" fill="clear" (click)="siguiente()">Continuar</ion-button>
+      </ion-col>
+    </ion-row>
   </div>
+
+
+  <app-progressbar [mostrar]="mostrarProgress" titulo="Buscando Bodegas"></app-progressbar>
+
+
 </ion-content>

@@ -1,27 +1,88 @@
-#container {
+.combo{
+  width: 100%;
+  max-width: 100%;
+}
+.centrado{
   text-align: center;
-
+  width: 100%;       
+  height: 10%;
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  top:45%;  
+  padding-left: 60px;
+  padding-right: 60px;         
 }
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.titulo-item{
+  font-size: 14px;
+  color: #000000DE;
+  font-weight: bold;
 }
-
-#container p {
+.titulo-fecha{
   font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+  color: #000000DE;
 }
-
-#container a {
-  text-decoration: none;
+.titulo-hora{
+  font-size: 12px;
+  color: #000000DE;
+}
+.no-encontrado{
+  font-size: 16px;
+  color: #0000008A;
+}
+.pt-8{
+  padding-top: 8px;
+}
+.pb-8{
+  padding-bottom: 8px;
+}
+.pl-24{
+  padding-left: 24px;
+}
+.pr-24{
+  padding-right: 24px;
+}
+.linea-item{
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #0000001F;
+}
+.borde{
+  border-radius: 5px;
+  border: 1px solid #0000001F;
+  padding: 5px;
+  padding-top: 0;
+}
+.label-tda{
+  position: relative;
+  top:-10px;
+  margin-left: 16px;
+  padding-left: 2px;
+  padding-right: 5px;
+  background: white;
+}
+.pt-32{
+  padding-top: 32px;
+}
+.titulo-item-2{
+  font-size: 16px;
+  color: #000000DE;
+}
+/*centrado disponibilidad*/
+.centradoDisp{
+  text-align: center;
+  width: 100%;       
+  height: 10%;
+  position: absolute;
+  top:35%;  
+  padding-left: 60px;
+  padding-right: 60px;         
+}
+.bienvenido{
+  padding-top: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.botones{
+  padding-top: 24px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
