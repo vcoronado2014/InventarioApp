@@ -411,6 +411,26 @@ let ServicioGlobal = class ServicioGlobal {
         let data = this.http.post(url, body, headers);
         return data;
     }
+    obtenerBodegas(token, nodId) {
+        let url = _environments_environment__WEBPACK_IMPORTED_MODULE_1__.environment.API_ENDPOINT + 'api/rayen/Abastecimiento/Bodega/IdNodo=' + nodId;
+        let httpHeaders = new _angular_common_http__WEBPACK_IMPORTED_MODULE_3__.HttpHeaders({
+            'Authorization': 'Bearer ' + token
+        });
+        var options = {
+            headers: httpHeaders
+        };
+        let data = this.httpClient.get(url, options);
+        return data;
+    }
+    obtenerBodegasNative(token, nodId) {
+        let url = _environments_environment__WEBPACK_IMPORTED_MODULE_1__.environment.API_ENDPOINT + 'api/rayen/Abastecimiento/Bodega/IdNodo=' + nodId;
+        const headers = {
+            'Authorization': 'Bearer ' + token
+        };
+        //this.http.setDataSerializer('json');
+        let data = this.http.get(url, {}, headers);
+        return data;
+    }
     cerrarSesion() {
         localStorage.removeItem('FUNCIONARIO_PRESTADOR');
         sessionStorage.clear();

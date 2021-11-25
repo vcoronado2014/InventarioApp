@@ -1,9 +1,9 @@
 <ion-header>
   <ion-toolbar color="primary" mode="md">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home" class="fcw"></ion-back-button>
+    <ion-buttons slot="start" (click)="volver()">
+      <ion-icon style="padding-left: 8px;" size="large" name="arrow-back"></ion-icon>
     </ion-buttons>
-    <ion-title>Farmacia</ion-title>
+    <ion-title>{{nombreBodega}}</ion-title>
     <ion-buttons slot="end" style="padding-right: 20px;" (click)="guardarTodo()">
       <ion-icon size="large" name="save"></ion-icon>
     </ion-buttons>
@@ -13,7 +13,7 @@
 <ion-content class="back-app">
   <!-- busqueda -->
   <div *ngIf="mostrarProgress == false">
-    <ion-row class="ion-padding">
+    <ion-row class="ion-padding" style="padding-bottom: 0;">
       <mat-form-field appearance="outline" style="width: 100%;">
         <mat-label>Buscar</mat-label>
         <input matInput type="text" [(ngModel)]="textoBuscar" placeholder="Buscar" (keyup)="buscarTexto()">
@@ -23,6 +23,11 @@
       </mat-form-field>
     </ion-row>
     <ion-row>
+      <ion-item class="ion-no-padding" style="width: 100%;" *ngIf="totalArticulosEditando > 0">
+        <ion-badge *ngIf="totalArticulosEditando == 1" color="medium" slot="end">{{totalArticulosEditando}} artículo editado.</ion-badge>
+        <ion-badge *ngIf="totalArticulosEditando > 1" color="medium" slot="end">{{totalArticulosEditando}} artículos editados.</ion-badge>
+      </ion-item>
+      
       <ion-list style="width: 100%;">
         <ion-item *ngFor="let arti of articulosFiltrados">
           <!--
@@ -77,6 +82,6 @@
     </ion-row>
   </div>
 
-  <app-progressbar [mostrar]="mostrarProgress" titulo="Guardando..."></app-progressbar>
+  <app-progressbar [mostrar]="mostrarProgress" [titulo]="mensaje"></app-progressbar>
 
 </ion-content>

@@ -102,25 +102,78 @@ let ListadoPage = class ListadoPage {
         this.global = global;
         this.articulos = [];
         this.articulosFiltrados = [];
+        this.nombreBodega = '';
+        this.bodegas = [];
+        this.bodegaTipoUno = null;
         this.textoBuscar = '';
         this.mostrarProgress = false;
+        this.mensaje = '';
+        this.totalArticulosEditando = 0;
+    }
+    loadBodegas() {
+        if (sessionStorage.getItem('BODEGA_TIPO_1')) {
+            this.bodegaTipoUno = JSON.parse(sessionStorage.getItem('BODEGA_TIPO_1'));
+        }
+        else {
+            var nodId = this.funcionario.configuracionNodo != null ? this.funcionario.configuracionNodo.IdNodo : 0;
+            this.mostrarProgress = true;
+            this.mensaje = 'Obteniendo datos...';
+            if (this.isAppOnDevice()) {
+                this.global.obtenerBodegasNative(this.funcionario.access_token, nodId).then((bode) => {
+                    //console.log(bode);
+                    this.bodegas = JSON.parse(bode.data);
+                    this.bodegaTipoUno = this.bodegas.length > 0 ? this.bodegas.filter(p => p.TipoBodega == 1)[0] : null;
+                    //guardamos la bodega en la variable de sesion
+                    sessionStorage.setItem('BODEGA_TIPO_1', JSON.stringify(this.bodegaTipoUno));
+                    this.mostrarProgress = false;
+                    this.mensaje = '';
+                }, (error) => {
+                    console.log(error);
+                    this.global.presentToast('Ocurrió un error al cargar las bodegas tipo 1', 'bottom', 4000);
+                    this.mostrarProgress = false;
+                    this.mensaje = '';
+                });
+            }
+            else {
+                this.global.obtenerBodegas(this.funcionario.access_token, nodId).subscribe((bode) => {
+                    console.log(bode);
+                    this.bodegas = bode;
+                    this.bodegaTipoUno = bode.length > 0 ? bode.filter(p => p.TipoBodega == 1)[0] : null;
+                    //guardamos la bodega en la variable de sesion
+                    sessionStorage.setItem('BODEGA_TIPO_1', JSON.stringify(this.bodegaTipoUno));
+                    this.mostrarProgress = false;
+                    this.mensaje = '';
+                }, error => {
+                    console.log(error);
+                    this.global.presentToast('Ocurrió un error al cargar las bodegas tipo 1', 'bottom', 4000);
+                    this.mostrarProgress = false;
+                    this.mensaje = '';
+                });
+            }
+        }
     }
     loadData() {
         this.mostrarProgress = true;
         this.textoBuscar = '';
-        if (sessionStorage.getItem('ARTICULOS_FILTRADOS')) {
-            this.articulos = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
-            this.articulosFiltrados = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
-            //console.log(this.articulos);
-            //console.log(this.articulosFiltrados);
-        }
-        this.mostrarProgress = false;
+        this.mensaje = 'Obteniendo datos...';
+        setTimeout(() => {
+            if (sessionStorage.getItem('ARTICULOS_FILTRADOS')) {
+                this.articulos = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
+                this.articulosFiltrados = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
+                this.nombreBodega = this.articulos[0].BODE_NOMBRE;
+                //console.log(this.articulos);
+                //console.log(this.articulosFiltrados);
+            }
+            this.mostrarProgress = false;
+            this.mensaje = '';
+        }, 3000);
     }
     ngOnInit() {
         if (localStorage.getItem('FUNCIONARIO_PRESTADOR')) {
             this.funcionario = JSON.parse(localStorage.getItem('FUNCIONARIO_PRESTADOR'));
         }
         this.loadData();
+        this.loadBodegas();
     }
     guardarTodo() {
         //console.log(this.articulos);
@@ -140,17 +193,20 @@ let ListadoPage = class ListadoPage {
                 //console.log(objetoAgregar);
                 //prueba
                 this.mostrarProgress = true;
+                this.mensaje = 'Guardando datos...';
                 //llamada a guardar
                 if (this.isAppOnDevice()) {
                     //nativa
                     this.global.postMovimientoNative(this.funcionario.access_token, objetoAgregar).then((data) => {
                         //console.log(data);
                         this.mostrarProgress = false;
-                        this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+                        this.mensaje = '';
+                        this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
                         this.irAHome();
                     }, (error) => {
                         console.log(error);
                         this.mostrarProgress = false;
+                        this.mensaje = '';
                         this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
                     });
                 }
@@ -159,11 +215,13 @@ let ListadoPage = class ListadoPage {
                     this.global.postMovimiento(this.funcionario.access_token, objetoAgregar).subscribe((data) => {
                         //console.log(data);
                         this.mostrarProgress = false;
-                        this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+                        this.mensaje = '';
+                        this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
                         this.irAHome();
                     }, error => {
                         console.log(error);
                         this.mostrarProgress = false;
+                        this.mensaje = '';
                         this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
                     });
                 }
@@ -176,16 +234,19 @@ let ListadoPage = class ListadoPage {
                 console.log(objetoQuitar);
                 //prueba
                 this.mostrarProgress = true;
+                this.mensaje = 'Guardando datos...';
                 if (this.isAppOnDevice()) {
                     //nativa
                     this.global.postMovimientoNative(this.funcionario.access_token, objetoQuitar).then((data) => {
                         //console.log(data);
                         this.mostrarProgress = false;
-                        this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+                        this.mensaje = '';
+                        this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
                         this.irAHome();
                     }, (error) => {
                         //console.log(error);
                         this.mostrarProgress = false;
+                        this.mensaje = '';
                         this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
                     });
                 }
@@ -194,11 +255,13 @@ let ListadoPage = class ListadoPage {
                     this.global.postMovimiento(this.funcionario.access_token, objetoQuitar).subscribe((data) => {
                         //console.log(data);
                         this.mostrarProgress = false;
-                        this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+                        this.mensaje = '';
+                        this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
                         this.irAHome();
                     }, error => {
                         console.log(error);
                         this.mostrarProgress = false;
+                        this.mensaje = '';
                         this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
                     });
                 }
@@ -217,7 +280,7 @@ let ListadoPage = class ListadoPage {
         var idFuncionarioOrigen = 0;
         var idFuncionarioDestino = this.funcionario.funcionarioPrestador != null ? this.funcionario.funcionarioPrestador.id : 0;
         var idBodegaOrigen = articulosQuitando.length > 0 ? articulosQuitando[0].BODE_ID : 0;
-        var idBodegaDestino = articulosQuitando.length > 0 ? articulosQuitando[0].BODE_ID : 0;
+        var idBodegaDestino = this.bodegaTipoUno != null ? this.bodegaTipoUno.Id : 0;
         var numeroDocumentoExterno = 0;
         var tipoDocumentoExterno = '5';
         var correlativo = 0;
@@ -384,6 +447,7 @@ let ListadoPage = class ListadoPage {
     onChangeEvent(arti) {
         //console.log(arti);
         this.mostrarProgress = true;
+        this.mensaje = 'Obteniendo datos...';
         //buscamos el articulo especifico
         if (arti != null) {
             if (this.articulos) {
@@ -410,11 +474,13 @@ let ListadoPage = class ListadoPage {
                     }
                 });
             }
+            this.totalArticulosEditando = this.articulos.filter(a => a.Editando == true).length;
             // console.log(this.articulos);
             // console.log(this.articulosFiltrados);
             //estoy probando
             sessionStorage.setItem('ARTICULOS_FILTRADOS', JSON.stringify(this.articulos));
             this.mostrarProgress = false;
+            this.mensaje = '';
         }
     }
     buscarTexto() {
@@ -424,6 +490,7 @@ let ListadoPage = class ListadoPage {
         }
         if (this.textoBuscar.length >= 3) {
             this.mostrarProgress = true;
+            this.mensaje = 'Obteniendo datos...';
             if (this.articulos && this.articulos.length > 0) {
                 this.articulos.forEach((arti) => {
                     if (arti.NOMBRE_GENERICO.toUpperCase().includes(this.textoBuscar.toUpperCase())) {
@@ -432,9 +499,14 @@ let ListadoPage = class ListadoPage {
                 });
             }
             this.mostrarProgress = false;
+            this.mensaje = '';
         }
     }
     irAHome() {
+        this.navCtrl.navigateRoot('home');
+    }
+    volver() {
+        sessionStorage.removeItem('ARTICULOS_FILTRADOS');
         this.navCtrl.navigateRoot('home');
     }
     isAppOnDevice() {
@@ -493,7 +565,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header>\n  <ion-toolbar color=\"primary\" mode=\"md\">\n    <ion-buttons slot=\"start\">\n      <ion-back-button defaultHref=\"/home\" class=\"fcw\"></ion-back-button>\n    </ion-buttons>\n    <ion-title>Farmacia</ion-title>\n    <ion-buttons slot=\"end\" style=\"padding-right: 20px;\" (click)=\"guardarTodo()\">\n      <ion-icon size=\"large\" name=\"save\"></ion-icon>\n    </ion-buttons>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content class=\"back-app\">\n  <!-- busqueda -->\n  <div *ngIf=\"mostrarProgress == false\">\n    <ion-row class=\"ion-padding\">\n      <mat-form-field appearance=\"outline\" style=\"width: 100%;\">\n        <mat-label>Buscar</mat-label>\n        <input matInput type=\"text\" [(ngModel)]=\"textoBuscar\" placeholder=\"Buscar\" (keyup)=\"buscarTexto()\">\n        <button *ngIf=\"textoBuscar\" matSuffix mat-icon-button aria-label=\"Clear\" (click)=\"loadData()\">\n          <mat-icon>close</mat-icon>\n        </button>\n      </mat-form-field>\n    </ion-row>\n    <ion-row>\n      <ion-list style=\"width: 100%;\">\n        <ion-item *ngFor=\"let arti of articulosFiltrados\">\n          <!--\n            Agrega: false\n            BODE_ID: 5210\n            BODE_NOMBRE: \"Bodega Central\"\n            CANTIDAD_DE_RECETAS: 10\n            CODIGO_ESTANDAR: \"F-8024/01\"\n            Editando: false\n            ID: 25235\n            LINE_ID: 2\n            NOMBRE_GENERICO: \"Paracetamol 500 Mg Comprimidos \"\n            PSICOTROPICO: 0\n            Quita: false\n            STOCK: 18034\n            StockActual: 18034\n          -->\n          <ion-grid class=\"ion-no-padding\">\n            <ion-row>\n              <ion-col size=\"8\">\n                <ion-label class=\"list-row-1\">{{arti.CODIGO_ESTANDAR}}</ion-label>\n              </ion-col>\n              <ion-col size=\"4\">\n                <!-- <ion-label class=\"list-row-1\">CANTIDAD REAL</ion-label> -->\n              </ion-col>\n            </ion-row>\n            <ion-row>\n              <ion-col size=\"9\" class=\"ion-no-padding\">\n                <ion-row>\n                  <ion-col size=\"10\">\n                    <p class=\"list-row-2\">{{arti.NOMBRE_GENERICO}}</p>\n                    <div class=\"list-row-3\">Cantidad sistema: {{arti.STOCK}}</div>\n                  </ion-col>\n                  <ion-col size=\"2\" style=\"padding-top: 16px;\">\n                    <ion-icon *ngIf=\"arti.Quita\" name=\"arrow-down\" style=\"font-size: 16pt;\" color=\"danger\"></ion-icon>\n                    <ion-icon *ngIf=\"arti.Agrega\" name=\"arrow-up\" style=\"font-size: 16pt;\" color=\"success\"></ion-icon>\n                  </ion-col>\n                </ion-row>\n              </ion-col>\n              <ion-col size=\"3\">\n                <mat-form-field appearance=\"outline\" style=\"width: 100%;\">\n                  <mat-label>REAL</mat-label>\n                  <input matInput placeholder=\"0\" type=\"number\" name=\"stock\" [(ngModel)]=\"arti.StockActual\"\n                    (change)=\"onChangeEvent(arti)\">\n                </mat-form-field>\n              </ion-col>\n            </ion-row>\n          </ion-grid>\n        </ion-item>\n  \n      </ion-list>\n    </ion-row>\n  </div>\n\n  <app-progressbar [mostrar]=\"mostrarProgress\" titulo=\"Guardando...\"></app-progressbar>\n\n</ion-content>\n");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header>\n  <ion-toolbar color=\"primary\" mode=\"md\">\n    <ion-buttons slot=\"start\" (click)=\"volver()\">\n      <ion-icon style=\"padding-left: 8px;\" size=\"large\" name=\"arrow-back\"></ion-icon>\n    </ion-buttons>\n    <ion-title>{{nombreBodega}}</ion-title>\n    <ion-buttons slot=\"end\" style=\"padding-right: 20px;\" (click)=\"guardarTodo()\">\n      <ion-icon size=\"large\" name=\"save\"></ion-icon>\n    </ion-buttons>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content class=\"back-app\">\n  <!-- busqueda -->\n  <div *ngIf=\"mostrarProgress == false\">\n    <ion-row class=\"ion-padding\" style=\"padding-bottom: 0;\">\n      <mat-form-field appearance=\"outline\" style=\"width: 100%;\">\n        <mat-label>Buscar</mat-label>\n        <input matInput type=\"text\" [(ngModel)]=\"textoBuscar\" placeholder=\"Buscar\" (keyup)=\"buscarTexto()\">\n        <button *ngIf=\"textoBuscar\" matSuffix mat-icon-button aria-label=\"Clear\" (click)=\"loadData()\">\n          <mat-icon>close</mat-icon>\n        </button>\n      </mat-form-field>\n    </ion-row>\n    <ion-row>\n      <ion-item class=\"ion-no-padding\" style=\"width: 100%;\" *ngIf=\"totalArticulosEditando > 0\">\n        <ion-badge *ngIf=\"totalArticulosEditando == 1\" color=\"medium\" slot=\"end\">{{totalArticulosEditando}} artículo editado.</ion-badge>\n        <ion-badge *ngIf=\"totalArticulosEditando > 1\" color=\"medium\" slot=\"end\">{{totalArticulosEditando}} artículos editados.</ion-badge>\n      </ion-item>\n      \n      <ion-list style=\"width: 100%;\">\n        <ion-item *ngFor=\"let arti of articulosFiltrados\">\n          <!--\n            Agrega: false\n            BODE_ID: 5210\n            BODE_NOMBRE: \"Bodega Central\"\n            CANTIDAD_DE_RECETAS: 10\n            CODIGO_ESTANDAR: \"F-8024/01\"\n            Editando: false\n            ID: 25235\n            LINE_ID: 2\n            NOMBRE_GENERICO: \"Paracetamol 500 Mg Comprimidos \"\n            PSICOTROPICO: 0\n            Quita: false\n            STOCK: 18034\n            StockActual: 18034\n          -->\n          <ion-grid class=\"ion-no-padding\">\n            <ion-row>\n              <ion-col size=\"8\">\n                <ion-label class=\"list-row-1\">{{arti.CODIGO_ESTANDAR}}</ion-label>\n              </ion-col>\n              <ion-col size=\"4\">\n                <!-- <ion-label class=\"list-row-1\">CANTIDAD REAL</ion-label> -->\n              </ion-col>\n            </ion-row>\n            <ion-row>\n              <ion-col size=\"9\" class=\"ion-no-padding\">\n                <ion-row>\n                  <ion-col size=\"10\">\n                    <p class=\"list-row-2\">{{arti.NOMBRE_GENERICO}}</p>\n                    <div class=\"list-row-3\">Cantidad sistema: {{arti.STOCK}}</div>\n                  </ion-col>\n                  <ion-col size=\"2\" style=\"padding-top: 16px;\">\n                    <ion-icon *ngIf=\"arti.Quita\" name=\"arrow-down\" style=\"font-size: 16pt;\" color=\"danger\"></ion-icon>\n                    <ion-icon *ngIf=\"arti.Agrega\" name=\"arrow-up\" style=\"font-size: 16pt;\" color=\"success\"></ion-icon>\n                  </ion-col>\n                </ion-row>\n              </ion-col>\n              <ion-col size=\"3\">\n                <mat-form-field appearance=\"outline\" style=\"width: 100%;\">\n                  <mat-label>REAL</mat-label>\n                  <input matInput placeholder=\"0\" type=\"number\" name=\"stock\" [(ngModel)]=\"arti.StockActual\"\n                    (change)=\"onChangeEvent(arti)\">\n                </mat-form-field>\n              </ion-col>\n            </ion-row>\n          </ion-grid>\n        </ion-item>\n  \n      </ion-list>\n    </ion-row>\n  </div>\n\n  <app-progressbar [mostrar]=\"mostrarProgress\" [titulo]=\"mensaje\"></app-progressbar>\n\n</ion-content>\n");
 
 /***/ })
 

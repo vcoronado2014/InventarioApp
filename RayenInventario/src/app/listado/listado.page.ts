@@ -15,9 +15,16 @@ export class ListadoPage implements OnInit {
   funcionario;
   articulos = [];
   articulosFiltrados = [];
+  nombreBodega = '';
+  bodegas = [];
+  bodegaTipoUno = null;
 
   textoBuscar = '';
   mostrarProgress = false;
+
+  mensaje='';
+
+  totalArticulosEditando = 0;
 
   constructor(
     private navCtrl: NavController,
@@ -29,22 +36,71 @@ export class ListadoPage implements OnInit {
     public global: ServicioGlobal
   ) { }
 
+  loadBodegas(){
+    
+    if (sessionStorage.getItem('BODEGA_TIPO_1')){
+      this.bodegaTipoUno = JSON.parse(sessionStorage.getItem('BODEGA_TIPO_1'));
+    }
+    else{
+      var nodId = this.funcionario.configuracionNodo != null ? this.funcionario.configuracionNodo.IdNodo : 0;
+      this.mostrarProgress = true;
+      this.mensaje = 'Obteniendo datos...';
+      if(this.isAppOnDevice()){
+        this.global.obtenerBodegasNative(this.funcionario.access_token, nodId).then((bode:any)=>{
+          //console.log(bode);
+          this.bodegas = JSON.parse(bode.data);
+          this.bodegaTipoUno = this.bodegas.length > 0 ? this.bodegas.filter(p=>p.TipoBodega == 1)[0] : null;
+          //guardamos la bodega en la variable de sesion
+          sessionStorage.setItem('BODEGA_TIPO_1', JSON.stringify(this.bodegaTipoUno));
+          this.mostrarProgress = false;
+          this.mensaje = '';
+        }, (error)=>{
+          console.log(error);
+          this.global.presentToast('Ocurrió un error al cargar las bodegas tipo 1', 'bottom', 4000);
+          this.mostrarProgress = false;
+          this.mensaje = '';
+        })
+      }
+      else{
+        this.global.obtenerBodegas(this.funcionario.access_token, nodId).subscribe((bode:any)=>{
+          console.log(bode);
+          this.bodegas = bode;
+          this.bodegaTipoUno = bode.length > 0 ? bode.filter(p=>p.TipoBodega == 1)[0] : null;
+          //guardamos la bodega en la variable de sesion
+          sessionStorage.setItem('BODEGA_TIPO_1', JSON.stringify(this.bodegaTipoUno));
+          this.mostrarProgress = false;
+          this.mensaje = '';
+        }, error=>{
+          console.log(error);
+          this.global.presentToast('Ocurrió un error al cargar las bodegas tipo 1', 'bottom', 4000);
+          this.mostrarProgress = false;
+          this.mensaje = '';
+        })
+      }
+    }
+  }
   loadData() {
     this.mostrarProgress = true;
     this.textoBuscar = '';
-    if (sessionStorage.getItem('ARTICULOS_FILTRADOS')) {
-      this.articulos = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
-      this.articulosFiltrados = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
-      //console.log(this.articulos);
-      //console.log(this.articulosFiltrados);
-    }
-    this.mostrarProgress = false;
+    this.mensaje = 'Obteniendo datos...';
+    setTimeout(() => {
+      if (sessionStorage.getItem('ARTICULOS_FILTRADOS')) {
+        this.articulos = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
+        this.articulosFiltrados = JSON.parse(sessionStorage.getItem('ARTICULOS_FILTRADOS'));
+        this.nombreBodega = this.articulos[0].BODE_NOMBRE;
+        //console.log(this.articulos);
+        //console.log(this.articulosFiltrados);
+      }
+      this.mostrarProgress = false;
+      this.mensaje = '';
+    }, 3000);
   }
   ngOnInit() {
     if (localStorage.getItem('FUNCIONARIO_PRESTADOR')){
       this.funcionario = JSON.parse(localStorage.getItem('FUNCIONARIO_PRESTADOR'));
     }
     this.loadData();
+    this.loadBodegas();
   }
   guardarTodo(){
     //console.log(this.articulos);
@@ -66,17 +122,20 @@ export class ListadoPage implements OnInit {
 
         //prueba
         this.mostrarProgress = true;
+        this.mensaje = 'Guardando datos...';
         //llamada a guardar
         if(this.isAppOnDevice()){
           //nativa
           this.global.postMovimientoNative(this.funcionario.access_token, objetoAgregar).then((data:any)=>{
             //console.log(data);
             this.mostrarProgress = false;
-            this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+            this.mensaje = '';
+            this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
             this.irAHome();
           }, (error)=>{
             console.log(error);
             this.mostrarProgress = false;
+            this.mensaje = '';
             this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
           })
         }
@@ -85,11 +144,13 @@ export class ListadoPage implements OnInit {
           this.global.postMovimiento(this.funcionario.access_token, objetoAgregar).subscribe((data:any)=>{
             //console.log(data);
             this.mostrarProgress = false;
-            this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+            this.mensaje = '';
+            this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
             this.irAHome();
           }, error=>{
             console.log(error);
             this.mostrarProgress = false;
+            this.mensaje = '';
             this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
           })
         }
@@ -102,16 +163,19 @@ export class ListadoPage implements OnInit {
         console.log(objetoQuitar);
         //prueba
         this.mostrarProgress = true;
+        this.mensaje = 'Guardando datos...';
         if(this.isAppOnDevice()){
           //nativa
           this.global.postMovimientoNative(this.funcionario.access_token, objetoQuitar).then((data: any) => {
             //console.log(data);
             this.mostrarProgress = false;
-            this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+            this.mensaje = '';
+            this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
             this.irAHome();
           }, (error) => {
             //console.log(error);
             this.mostrarProgress = false;
+            this.mensaje = '';
             this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
           })
         }
@@ -120,11 +184,13 @@ export class ListadoPage implements OnInit {
           this.global.postMovimiento(this.funcionario.access_token, objetoQuitar).subscribe((data: any) => {
             //console.log(data);
             this.mostrarProgress = false;
-            this.global.presentToast('Datos guardados correctamente', 'bottom', 3500);
+            this.mensaje = '';
+            this.global.presentToast('Inventario actualizado con éxito!!', 'bottom', 3500);
             this.irAHome();
           }, error => {
             console.log(error);
             this.mostrarProgress = false;
+            this.mensaje = '';
             this.global.presentToast('Ocurrió un error al guardar', 'bottom', 3500);
           })
         }
@@ -145,7 +211,7 @@ export class ListadoPage implements OnInit {
     var idFuncionarioOrigen = 0;
     var idFuncionarioDestino = this.funcionario.funcionarioPrestador != null ? this.funcionario.funcionarioPrestador.id : 0;
     var idBodegaOrigen = articulosQuitando.length > 0 ? articulosQuitando[0].BODE_ID : 0;
-    var idBodegaDestino = articulosQuitando.length > 0 ? articulosQuitando[0].BODE_ID : 0;
+    var idBodegaDestino = this.bodegaTipoUno != null ? this.bodegaTipoUno.Id : 0;
     var numeroDocumentoExterno = 0;
     var tipoDocumentoExterno = '5';
     var correlativo = 0;
@@ -319,6 +385,7 @@ export class ListadoPage implements OnInit {
   onChangeEvent(arti){
     //console.log(arti);
     this.mostrarProgress = true;
+    this.mensaje = 'Obteniendo datos...';
     //buscamos el articulo especifico
     if (arti != null){
       if (this.articulos){
@@ -345,11 +412,13 @@ export class ListadoPage implements OnInit {
           }
         })
       }
+      this.totalArticulosEditando = this.articulos.filter(a=>a.Editando == true).length;
      // console.log(this.articulos);
      // console.log(this.articulosFiltrados);
       //estoy probando
       sessionStorage.setItem('ARTICULOS_FILTRADOS', JSON.stringify(this.articulos));
       this.mostrarProgress = false;
+      this.mensaje = '';
     }
   }
   buscarTexto(){
@@ -359,6 +428,7 @@ export class ListadoPage implements OnInit {
     }
     if(this.textoBuscar.length >= 3){
       this.mostrarProgress = true;
+      this.mensaje = 'Obteniendo datos...';
       if (this.articulos && this.articulos.length > 0){
         this.articulos.forEach((arti: any) => {
           if (arti.NOMBRE_GENERICO.toUpperCase().includes(this.textoBuscar.toUpperCase())) {
@@ -367,11 +437,17 @@ export class ListadoPage implements OnInit {
         })
       }
       this.mostrarProgress = false;
+      this.mensaje = '';
     }
 
   }
   irAHome() {
     this.navCtrl.navigateRoot('home');
+  }
+  volver(){
+    sessionStorage.removeItem('ARTICULOS_FILTRADOS');
+    this.navCtrl.navigateRoot('home');
+
   }
 
   isAppOnDevice(): boolean {

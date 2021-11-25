@@ -111,6 +111,29 @@ export class ServicioGlobal{
         return data;
 
     }
+    obtenerBodegas(token, nodId){
+        let url = environment.API_ENDPOINT + 'api/rayen/Abastecimiento/Bodega/IdNodo=' + nodId;
+
+        let httpHeaders = new HttpHeaders({
+            'Authorization': 'Bearer ' + token
+        });
+
+        var options = {
+            headers: httpHeaders
+        };
+
+        let data = this.httpClient.get(url, options);
+        return data;
+    }
+    obtenerBodegasNative(token, nodId){
+        let url = environment.API_ENDPOINT + 'api/rayen/Abastecimiento/Bodega/IdNodo=' + nodId;
+        const headers = {
+            'Authorization': 'Bearer ' + token
+        };
+        //this.http.setDataSerializer('json');
+        let data = this.http.get(url, {}, headers);
+        return data;
+    }
 
     cerrarSesion(){
         localStorage.removeItem('FUNCIONARIO_PRESTADOR');

@@ -167,47 +167,54 @@ let HomePage = class HomePage {
     }
     procesarBodegas() {
         this.bodegas = [];
-        this.disabledCombo = true;
         if (this.articulos) {
-            this.articulos.forEach(articulo => {
-                /*
-                BODE_ID: 11526
-                BODE_NOMBRE: "CARRO DE PARO"
-                CANTIDAD_DE_RECETAS: 10
-                CODIGO_ESTANDAR: "F-8024/01"
-                ID: 25235
-                LINE_ID: 2
-                NOMBRE_GENERICO: "Paracetamol 500 Mg Comprimidos "
-                PSICOTROPICO: 0
-                STOCK: 798
-                
-                */
-                articulo.Agrega = false;
-                articulo.Quita = false;
-                articulo.Editando = false;
-                articulo.StockActual = articulo.STOCK;
-                var buscar = this.bodegas.filter(e => e.Id == articulo.BODE_ID);
-                if (buscar.length == 0) {
-                    //agregamos la bodega
-                    var entidadBodega = {
-                        Id: articulo.BODE_ID,
-                        Nombre: articulo.BODE_NOMBRE
-                    };
-                    this.bodegas.push(entidadBodega);
-                }
-            });
+            this.disabledCombo = true;
+            this.mostrarProgress = true;
+            setTimeout(() => {
+                this.articulos.forEach(articulo => {
+                    articulo.Agrega = false;
+                    articulo.Quita = false;
+                    articulo.Editando = false;
+                    articulo.StockActual = articulo.STOCK;
+                    var buscar = this.bodegas.filter(e => e.Id == articulo.BODE_ID);
+                    if (buscar.length == 0) {
+                        //agregamos la bodega
+                        var entidadBodega = {
+                            Id: articulo.BODE_ID,
+                            Nombre: articulo.BODE_NOMBRE
+                        };
+                        this.bodegas.push(entidadBodega);
+                    }
+                });
+                this.disabledCombo = false;
+                this.mostrarProgress = false;
+            }, 2000);
         }
         //console.log(this.bodegas);
-        this.disabledCombo = false;
     }
+    /*
+    setTimeout(() => {
+      //console.log('Async operation has ended');
+  
+      //event.target.complete();
+      this.mostrarProgress = false;
+      //this.encontroCitas = true;
+      //si existen citas hay que deshabilitar el control
+      this.disabledCombo = true;
+      this.indexarCitas();
+    }, 2000);
+    */
     buscarBodegas(event) {
         if (event.value) {
             this.mostrarProgress = true;
-            this.idComboSeleccionado = event.value;
-            //console.log(event.value);
-            this.articulosFiltrados = this.articulos.filter(a => a.BODE_ID == event.value);
-            //console.log(this.articulosFiltrados);
-            this.mostrarProgress = false;
+            setTimeout(() => {
+                this.idComboSeleccionado = event.value;
+                //console.log(event.value);
+                this.articulosFiltrados = this.articulos.filter(a => a.BODE_ID == event.value);
+                sessionStorage.setItem('ARTICULOS_FILTRADOS', JSON.stringify(this.articulosFiltrados));
+                //console.log(this.articulosFiltrados);
+                this.mostrarProgress = false;
+            }, 3000);
         }
     }
     siguiente() {
@@ -215,11 +222,11 @@ let HomePage = class HomePage {
             this.global.presentToast('Debe seleccionar una bodega antes de continuar', 'bottom', 3000);
             return;
         }
-        this.mostrarProgress = true;
+        //this.mostrarProgress = true;
         //guardamos en una variable de sesión los articulos filtrados
-        sessionStorage.setItem('ARTICULOS_FILTRADOS', JSON.stringify(this.articulosFiltrados));
+        //sessionStorage.setItem('ARTICULOS_FILTRADOS', JSON.stringify(this.articulosFiltrados));
         //vamos a la página del listado
-        this.mostrarProgress = false;
+        //this.mostrarProgress = false;
         this.irAListado();
     }
     irAListado() {
