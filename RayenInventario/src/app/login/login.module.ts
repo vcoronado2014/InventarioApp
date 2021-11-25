@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { RouterModule } from '@angular/router';
+import { ComponentsModule } from '../components/components.module';
 
 import { LoginPage } from './login.page';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,6 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    ComponentsModule,
     RouterModule.forChild([
       {
         path: '',

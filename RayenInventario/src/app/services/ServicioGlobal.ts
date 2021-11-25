@@ -62,18 +62,75 @@ export class ServicioGlobal{
 
     postLoginNative(ubicacion, usuario, password){
         let user = usuario + '@' + ubicacion;
-        const body = "username=" + user.toLowerCase() + "&password=" + password + "&grant_type=password";
+        //const body = "username=" + user.toLowerCase() + "&password=" + password + "&grant_type=password";
+        const body = { username: user.toLowerCase(), password: password, grant_type: "password" };
+
+        const httpOptions = {
+            headers: new HttpHeaders({
+                "Content-Type": "application/x-www-form-urlencoded"
+            })
+        };
+        const headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        };
 
         let url = environment.API_ENDPOINT + 'token';
-        this.http.setDataSerializer('urlencoded');
+        //this.http.setDataSerializer('json');
 
-        let data = this.http.post(url, body, {});
+        let data = this.http.post(url, body, headers);
         return data;
     }
+
+    postMovimiento(token, objArticulo){
+        let body = JSON.stringify(objArticulo);
+        let url = environment.API_ENDPOINT + 'api/rayen/Abastecimiento/ComprobanteMovimiento';
+        let httpHeaders = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            'Authorization': 'Bearer ' + token
+        });
+        httpHeaders.set('Access-Control-Allow-Origin', '*');
+        httpHeaders.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+        httpHeaders.set("Access-Control-Allow-Headers", "*");
+
+        let options = { headers: httpHeaders };
+
+        let data = this.httpClient.post(url, body, options);
+        return data;
+
+    }
+    postMovimientoNative(token, objArticulo){
+        let body = objArticulo;
+        let url = environment.API_ENDPOINT + 'api/rayen/Abastecimiento/ComprobanteMovimiento';
+        const headers = {
+            'Authorization': 'Bearer ' + token
+        };
+
+        this.http.setDataSerializer('json');
+        let data = this.http.post(url, body, headers);
+        return data;
+
+    }
+
     cerrarSesion(){
         localStorage.removeItem('FUNCIONARIO_PRESTADOR');
         sessionStorage.clear();
         this.navCtrl.navigateRoot('login');
+    }
+    entregaFechaStr(){
+        var date = new Date();
+        var strDate = '';
+        var strDia = '';
+        var strMes = '';
+        var strAnio = '';
+
+        strDia = date.getDate() < 10 ? '0' + date.getDate().toString() : date.getDate().toString();
+        strMes = date.getMonth() < 10 ? '0' + date.getMonth().toString() : date.getMonth().toString();
+        strAnio = date.getFullYear().toString();
+
+        strDate = strAnio + strMes + strDia + ' 000000';
+
+        return strDate;
     }
 
 }

@@ -46,15 +46,21 @@ export class HomePage implements OnInit {
     if (this.isAppOnDevice()){
       //nativa
       this.global.getArticulosNative(nodId, 2).then((data:any)=>{
-        this.articulos = data.json();
+        this.articulos = JSON.parse(data.data);
 
         this.global.getArticulos(nodId, 3).subscribe((dataDos: any)=>{
-          var insumos = dataDos.json();
+          var insumos = dataDos;
           this.articulos = this.articulos.concat(insumos);
-          console.log(this.articulos);
+          //console.log(this.articulos);
           this.procesarBodegas();
           this.mostrarProgress = false;
+        }, (error)=>{
+          this.global.presentToast('Se ha producido un error al obtener los artículos', 'bottom', 4000);
+          this.mostrarProgress = false;
         })
+      }, (error)=>{
+        this.global.presentToast('Se ha producido un error al obtener los artículos', 'bottom', 4000);
+        this.mostrarProgress = false;
       })
     }
     else{
@@ -65,10 +71,16 @@ export class HomePage implements OnInit {
         this.global.getArticulos(nodId, 3).subscribe((dataDos: any)=>{
           var insumos = dataDos;
           this.articulos = this.articulos.concat(insumos);
-          console.log(this.articulos);
+          //console.log(this.articulos);
           this.procesarBodegas();
           this.mostrarProgress = false;
+        }, error=>{
+          this.global.presentToast('Se ha producido un error al obtener los artículos', 'bottom', 4000);
+          this.mostrarProgress = false;
         })
+      }, error=>{
+        this.global.presentToast('Se ha producido un error al obtener los artículos', 'bottom', 4000);
+        this.mostrarProgress = false;
       })
     }
   }
@@ -120,16 +132,17 @@ export class HomePage implements OnInit {
         }
       });
     }
-    console.log(this.bodegas);
+    //console.log(this.bodegas);
     this.disabledCombo = false;
   }
   buscarBodegas(event){
     if (event.value){
+      this.mostrarProgress = true;
       this.idComboSeleccionado = event.value;
-      console.log(event.value);
+      //console.log(event.value);
       this.articulosFiltrados = this.articulos.filter(a=>a.BODE_ID == event.value);
-      console.log(this.articulosFiltrados);
-
+      //console.log(this.articulosFiltrados);
+      this.mostrarProgress = false;
     }
   }
   siguiente(){
@@ -137,9 +150,11 @@ export class HomePage implements OnInit {
       this.global.presentToast('Debe seleccionar una bodega antes de continuar', 'bottom', 3000);
       return;
     }
+    this.mostrarProgress = true;
     //guardamos en una variable de sesión los articulos filtrados
     sessionStorage.setItem('ARTICULOS_FILTRADOS', JSON.stringify(this.articulosFiltrados));
     //vamos a la página del listado
+    this.mostrarProgress = false;
     this.irAListado();
   }
   irAListado() {

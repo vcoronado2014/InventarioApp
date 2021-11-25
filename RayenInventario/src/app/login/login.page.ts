@@ -15,7 +15,7 @@ export class LoginPage implements OnInit {
 
   registro;
   forma: FormGroup;
-  nombreMostrar;
+  nombreMostrar = '';
   //para validar
   patternOnlyLetter = '[a-zA-ZÀ-ÿ\u00f1\u00d1]+(\s*[a-zA-ZÀ-ÿ\u00f1\u00d1]*)*[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$';
   expCelular = /^(\+?56)?(\s?)(0?9)(\s?)[9876543]\d{7}$/gm;
@@ -41,20 +41,6 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {
     this.cargarForma();
-    //prueba de cargar articulos
-/*     if (this.isAppOnDevice()){
-      this.global.getArticulosNative(2411, 2).then((data:any)=>{
-        this.articulos = data.json();
-        console.log(this.articulos);
-      })
-    }
-    else{
-      this.global.getArticulos(2411, 2).subscribe((data:any)=>{
-        this.articulos = data;
-        console.log(this.articulos);
-      })
-    } */
-
   }
 
   cargarForma() {
@@ -76,9 +62,12 @@ export class LoginPage implements OnInit {
         })
       }
     }
+    if(localStorage.getItem('NOMBRE_LOGUEADO')){
+      this.nombreMostrar = localStorage.getItem('NOMBRE_LOGUEADO');
+    }
   }
   onChange(event){
-    console.log(event);
+    //console.log(event);
     if (this.forma.invalid){
       this.global.presentToast('Datos inválidos', 'bottom', 3000);
       return;
@@ -88,7 +77,7 @@ export class LoginPage implements OnInit {
     
     if (event.detail){
       this.recordarme = event.detail.checked;
-      console.log(this.recordarme);
+      //console.log(this.recordarme);
       localStorage.setItem('RECUERDA_LOGUEADO', this.recordarme.toString().toLowerCase());
       if (this.recordarme){
         //guardar los valores en varibales locales
@@ -108,13 +97,16 @@ export class LoginPage implements OnInit {
         nombreCompleto: datos.nombre + ' ' + datos.apellidoPaterno + ' ' + datos.apellidoMaterno,
         refresh_token: datos.refresh_token,
         configuracionNodo: JSON.parse(datos.configuracionNodo),
+        funcionarioPrestador: JSON.parse(datos.funcionarioPrestador)
       };
+      this.nombreMostrar = datos.nombre;
+      localStorage.setItem('NOMBRE_LOGUEADO', this.nombreMostrar);
 
       localStorage.setItem('FUNCIONARIO_PRESTADOR', JSON.stringify(userLogued));
     }
   }
 
-  async onSubmit(){
+/*   async onSubmit(){
     if (this.forma.invalid) {
       return;
     }
@@ -162,12 +154,89 @@ export class LoginPage implements OnInit {
       }
       else{
         //nativa
+        this.global.postLoginNative(ubicacion,usuario,password).then((data:any)=>{
+          let respuesta = JSON.parse(data.data);
+          console.log(respuesta);
+          //transformar la respuesta
+          this.estaCargando = false;
+          this.setDatosUsuario(respuesta);
+          loader.dismiss();
+          this.irAHome();
+        }, (error)=>{
+          this.estaCargando = false;
+          loader.dismiss();
+          let err = JSON.parse(error.error);
+
+          let mensaje = err.error_description ? err.error_description : 'Error de comunicación';
+          if (err.error == 'invalid_grant'){
+            this.global.presentToast(mensaje, 'bottom', 3000);
+          }
+          else{
+            this.global.presentToast(mensaje, 'bottom', 3000);
+          }
+        })
       }
 
     });
 
-  }
+  } */
 
+  async onSubmit() {
+    if (this.forma.invalid) {
+      return;
+    }
+    var ubicacion = this.forma.controls.ubicacion.value;
+    var usuario = this.forma.controls.usuario.value;
+    var password = this.forma.controls.clave.value;
+
+    this.estaCargando = true;
+    if (!this.isAppOnDevice()) {
+      //web
+      this.global.postLogin(ubicacion, usuario, password).subscribe((data) => {
+        let respuesta = data;
+        //console.log(respuesta);
+        //transformar la respuesta
+        this.setDatosUsuario(respuesta);
+        this.estaCargando = false;
+        this.irAHome();
+      },
+        error => {
+          this.estaCargando = false;
+          let err = error.error;
+          let mensaje = err.error_description ? err.error_description : 'Error de comunicación';
+          if (err.error == 'invalid_grant') {
+            this.global.presentToast(mensaje, 'bottom', 4000);
+          }
+          else {
+            this.global.presentToast(mensaje, 'bottom', 4000);
+          }
+        }
+
+      );
+    }
+    else {
+      //nativa
+      this.global.postLoginNative(ubicacion, usuario, password).then((data: any) => {
+        let respuesta = JSON.parse(data.data);
+        //console.log(respuesta);
+        //transformar la respuesta
+        this.setDatosUsuario(respuesta);
+        this.estaCargando = false;
+        this.irAHome();
+      }, (error) => {
+        this.estaCargando = false;
+        let err = JSON.parse(error.error);
+
+        let mensaje = err.error_description ? err.error_description : 'Error de comunicación';
+        if (err.error == 'invalid_grant') {
+          this.global.presentToast(mensaje, 'bottom', 4000);
+        }
+        else {
+          this.global.presentToast(mensaje, 'bottom', 4000);
+        }
+      })
+    }
+  }
   isAppOnDevice(): boolean {
     if (window.location.port === '8100') {
       return false;

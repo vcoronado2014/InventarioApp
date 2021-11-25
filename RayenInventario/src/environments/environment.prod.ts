@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  API_ENDPOINT_LOGIN : 'http://172.16.0.129:8044/token',
+  API_ENDPOINT : 'https://capaclinico.rayenaps.cl/api/',
+  API_ENDPOINT_GET_ARTICULOS: 'http://capamantenedorback.rayensalud.cl/BACKEND/api/mantenedores/MNT0003/'
 };

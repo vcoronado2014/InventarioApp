@@ -12,67 +12,71 @@
 
 <ion-content class="back-app">
   <!-- busqueda -->
-  <ion-row class="ion-padding">
-    <mat-form-field appearance="outline" style="width: 100%;">
-      <mat-label>Buscar</mat-label>
-      <input matInput type="text" [(ngModel)]="textoBuscar" placeholder="Buscar" (keyup)="buscarTexto()">
-      <button *ngIf="textoBuscar" matSuffix mat-icon-button aria-label="Clear" (click)="loadData()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
-  </ion-row>
-  <ion-row>
-    <ion-list style="width: 100%;">
-      <ion-item *ngFor="let arti of articulosFiltrados">
-        <!--
-          Agrega: false
-          BODE_ID: 5210
-          BODE_NOMBRE: "Bodega Central"
-          CANTIDAD_DE_RECETAS: 10
-          CODIGO_ESTANDAR: "F-8024/01"
-          Editando: false
-          ID: 25235
-          LINE_ID: 2
-          NOMBRE_GENERICO: "Paracetamol 500 Mg Comprimidos "
-          PSICOTROPICO: 0
-          Quita: false
-          STOCK: 18034
-          StockActual: 18034
-        -->
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <ion-col size="8">
-              <ion-label class="list-row-1">{{arti.CODIGO_ESTANDAR}}</ion-label>
-            </ion-col>
-            <ion-col size="4">
-              <!-- <ion-label class="list-row-1">CANTIDAD REAL</ion-label> -->
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col size="9" class="ion-no-padding">
-              <ion-row>
-                <ion-col size="10">
-                  <p class="list-row-2">{{arti.NOMBRE_GENERICO}}</p>
-                  <div class="list-row-3">Cantidad sistema: {{arti.STOCK}}</div>
-                </ion-col>
-                <ion-col size="2" style="padding-top: 16px;">
-                  <ion-icon *ngIf="arti.Quita" name="arrow-down" style="font-size: 16pt;" color="danger"></ion-icon>
-                  <ion-icon *ngIf="arti.Agrega" name="arrow-up" style="font-size: 16pt;" color="success"></ion-icon>
-                </ion-col>
-              </ion-row>
-            </ion-col>
-            <ion-col size="3">
-              <mat-form-field appearance="outline" style="width: 100%;">
-                <mat-label>REAL</mat-label>
-                <input matInput placeholder="0" type="number" name="stock" [(ngModel)]="arti.StockActual" (change)="onChangeEvent(arti)">
-              </mat-form-field>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
+  <div *ngIf="mostrarProgress == false">
+    <ion-row class="ion-padding">
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Buscar</mat-label>
+        <input matInput type="text" [(ngModel)]="textoBuscar" placeholder="Buscar" (keyup)="buscarTexto()">
+        <button *ngIf="textoBuscar" matSuffix mat-icon-button aria-label="Clear" (click)="loadData()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </ion-row>
+    <ion-row>
+      <ion-list style="width: 100%;">
+        <ion-item *ngFor="let arti of articulosFiltrados">
+          <!--
+            Agrega: false
+            BODE_ID: 5210
+            BODE_NOMBRE: "Bodega Central"
+            CANTIDAD_DE_RECETAS: 10
+            CODIGO_ESTANDAR: "F-8024/01"
+            Editando: false
+            ID: 25235
+            LINE_ID: 2
+            NOMBRE_GENERICO: "Paracetamol 500 Mg Comprimidos "
+            PSICOTROPICO: 0
+            Quita: false
+            STOCK: 18034
+            StockActual: 18034
+          -->
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col size="8">
+                <ion-label class="list-row-1">{{arti.CODIGO_ESTANDAR}}</ion-label>
+              </ion-col>
+              <ion-col size="4">
+                <!-- <ion-label class="list-row-1">CANTIDAD REAL</ion-label> -->
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="9" class="ion-no-padding">
+                <ion-row>
+                  <ion-col size="10">
+                    <p class="list-row-2">{{arti.NOMBRE_GENERICO}}</p>
+                    <div class="list-row-3">Cantidad sistema: {{arti.STOCK}}</div>
+                  </ion-col>
+                  <ion-col size="2" style="padding-top: 16px;">
+                    <ion-icon *ngIf="arti.Quita" name="arrow-down" style="font-size: 16pt;" color="danger"></ion-icon>
+                    <ion-icon *ngIf="arti.Agrega" name="arrow-up" style="font-size: 16pt;" color="success"></ion-icon>
+                  </ion-col>
+                </ion-row>
+              </ion-col>
+              <ion-col size="3">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                  <mat-label>REAL</mat-label>
+                  <input matInput placeholder="0" type="number" name="stock" [(ngModel)]="arti.StockActual"
+                    (change)="onChangeEvent(arti)">
+                </mat-form-field>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-item>
+  
+      </ion-list>
+    </ion-row>
+  </div>
 
-    </ion-list>
-  </ion-row>
-
+  <app-progressbar [mostrar]="mostrarProgress" titulo="Guardando..."></app-progressbar>
 
 </ion-content>
